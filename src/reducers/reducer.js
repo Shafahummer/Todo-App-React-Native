@@ -1,9 +1,8 @@
 
 const initialState = {
-    base_url: "http://192.168.1.4:5000/api",
+    base_url: "http://192.168.1.6:5000/api",
     user_token: ""
 }
-
 export const reducer = (state = initialState, action) => {
     switch (action.type) {
         case 'SET_USER_TOKEN':

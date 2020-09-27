@@ -8,8 +8,8 @@ import { useDispatch, useSelector } from 'react-redux';
 
 const LoginScreen = ({ navigation }) => {
 
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
+    const [email, setEmail] = useState("shafah@gmail.com")
+    const [password, setPassword] = useState("12345")
 
     const base_url = useSelector((state) => {
         return state.base_url;
@@ -26,7 +26,7 @@ const LoginScreen = ({ navigation }) => {
                         Toast.show(data.error)
                     } else if (data.token) {
                         Toast.show(data.message)
-                        dispatch({ action: "SET_USER_TOKEN", payload: data.token })
+                        dispatch({ type: "SET_USER_TOKEN", payload: data.token })
                         navigation.navigate("AddTodoScreen")
                     }
                     else {
@@ -58,7 +58,8 @@ const LoginScreen = ({ navigation }) => {
                     />
                     <View style={{ alignItems: "center", marginTop: 30 }}>
                         <TouchableOpacity style={styles.btn} onPress={() => {
-                            btnPressed()
+                            //btnPressed()
+                            navigation.navigate("HomeScreen")
                         }}>
                             <Text style={{ color: "#FFFFFF" }}>Login</Text>
                         </TouchableOpacity>
