@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 const LoginScreen = ({ navigation }) => {
 
-    const [email, setEmail] = useState("shafah@gmail.com")
+    const [email, setEmail] = useState("admin@gmail.com")
     const [password, setPassword] = useState("12345")
 
     const base_url = useSelector((state) => {
@@ -58,8 +58,8 @@ const LoginScreen = ({ navigation }) => {
                     />
                     <View style={{ alignItems: "center", marginTop: 30 }}>
                         <TouchableOpacity style={styles.btn} onPress={() => {
-                            //btnPressed()
-                            navigation.navigate("HomeScreen")
+                            btnPressed()
+                            //navigation.navigate("HomeScreen")
                         }}>
                             <Text style={{ color: "#FFFFFF" }}>Login</Text>
                         </TouchableOpacity>

@@ -61,33 +61,33 @@ const AddTodoScreen = ({ navigation }) => {
         });
     }
 
-    // const btnPressed = () => {
-    //     axios.post(base_url + '/create_todo', {
-    //         title: title,
-    //         education: education,
-    //         todos: JSON.stringify(todos),
-    //         todo_date: date,
-    //         photo: avatarSource
-    //     },
-    //         {
-    //             headers: {
-    //                 Authorization: 'Bearer ' + user_token
-    //             }
+    const btnPressed1 = () => {
+        axios.post(base_url + '/create_todo', {
+            title: title,
+            education: education,
+            todos: JSON.stringify(todos),
+            todo_date: date,
+            photo: avatarSource
+        },
+            {
+                headers: {
+                    Authorization: 'Bearer ' + user_token
+                }
 
-    //         })
-    //         .then(function (response) {
-    //             console.log(response.data);
-    //             if (response.data.error) {
-    //                 console.log(response.data.error)
-    //             }
-    //             else {
-    //                 console.log("success")
-    //             }
-    //         })
-    //         .catch(function (error) {
-    //             console.log(error);
-    //         })
-    // }
+            })
+            .then(function (response) {
+                console.log(response.data);
+                if (response.data.error) {
+                    console.log(response.data.error)
+                }
+                else {
+                    console.log("success")
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
 
     const btnPressed = () => {
         RNFetchBlob.fetch('POST', base_url + "/create_todo", {
