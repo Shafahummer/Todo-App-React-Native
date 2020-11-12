@@ -61,6 +61,10 @@ const AddTodoScreen = ({ navigation }) => {
         });
     }
 
+    const newTestFunction = ()=>{
+        console.log("this is a test function!!");
+    }
+
     const btnPressed1 = () => {
         axios.post(base_url + '/create_todo', {
             title: title,
