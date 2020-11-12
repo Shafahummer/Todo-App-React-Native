@@ -14,7 +14,7 @@ import { reducer } from './src/reducers/reducer'
 const Stack = createStackNavigator()
 
 const store = createStore(reducer);
-
+//this is a test for checking git fork
 const App = () => {
   return (
     <Provider store={store}>
