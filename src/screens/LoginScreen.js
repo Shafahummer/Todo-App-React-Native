@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Text, View, SafeAreaView, StyleSheet, TextInput } from 'react-native';
+import { Text, Image, View, SafeAreaView, StyleSheet, TextInput, ImageBackground } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { login } from '../apicalls/auth';
 import Toast from 'react-native-simple-toast';
 import { useDispatch, useSelector } from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const LoginScreen = ({ navigation }) => {
@@ -25,9 +26,29 @@ const LoginScreen = ({ navigation }) => {
                     if (data.error) {
                         Toast.show(data.error)
                     } else if (data.token) {
+                        try {
+                            AsyncStorage.setItem('token', data.token)
+                        } catch (e) {
+                            console.log("error");
+                        }
                         Toast.show(data.message)
                         dispatch({ type: "SET_USER_TOKEN", payload: data.token })
-                        navigation.navigate("AddTodoScreen")
+                        if (data.user.todo_added == "1") {
+                            try {
+                                AsyncStorage.setItem('todo_added', "1")
+                            } catch (e) {
+                                console.log("error");
+                            }
+                            navigation.reset({
+                                index: 0,
+                                routes: [{ name: 'HomeScreen' }]
+                            })
+                        } else {
+                            navigation.reset({
+                                index: 0,
+                                routes: [{ name: 'AddTodoScreen' }]
+                            })
+                        }
                     }
                     else {
                         Toast.show("Something wrong!Please try again...")
@@ -43,18 +64,22 @@ const LoginScreen = ({ navigation }) => {
     return (
         <>
             <SafeAreaView style={styles.top} />
-            <SafeAreaView style={styles.container}>
-                <View style={{ padding: 20, backgroundColor: "yellow" }}>
+            <ImageBackground source={require('../images/bg.jpg')} style={styles.container}>
+                <Image resizeMode="stretch" style={{ height: 250, width: "100%" }} source={{ uri: "https://images.pexels.com/photos/3773244/pexels-photo-3773244.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260" }} />
+                <View style={{ padding: 40 }}>
+                    <Text style={{ textAlign: "center", marginBottom: 30, fontSize: 18, color: "#FFFFFF" }}>Login here...</Text>
                     <TextInput
+                        placeholderTextColor="#000"
                         placeholder="Enter email"
-                        style={{ borderBottomColor: "#c1c1c1", borderBottomWidth: 1 }}
+                        style={{ height: 40, borderColor: "#c1c1c1", borderBottomWidth: 1 }}
                         onChangeText={(email) => setEmail(email)}
                     />
                     <TextInput
                         placeholder="Enter password"
+                        placeholderTextColor="#000"
                         secureTextEntry={true}
                         onChangeText={(pass) => setPassword(pass)}
-                        style={{ borderBottomColor: "#c1c1c1", borderBottomWidth: 1, marginTop: 25 }}
+                        style={{ height: 40, borderBottomColor: "#c1c1c1", borderBottomWidth: 1, marginTop: 25 }}
                     />
                     <View style={{ alignItems: "center", marginTop: 30 }}>
                         <TouchableOpacity style={styles.btn} onPress={() => {
@@ -70,7 +95,7 @@ const LoginScreen = ({ navigation }) => {
                         </TouchableOpacity>
                     </View>
                 </View>
-            </SafeAreaView>
+            </ImageBackground>
         </>
     )
 }
@@ -82,7 +107,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#FFFFFF",
-        justifyContent: "center"
     },
     btn: {
         paddingHorizontal: 40,
