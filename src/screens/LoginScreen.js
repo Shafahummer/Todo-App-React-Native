@@ -9,8 +9,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = ({ navigation }) => {
 
-    const [email, setEmail] = useState("admin@gmail.com")
-    const [password, setPassword] = useState("12345")
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
 
     const base_url = useSelector((state) => {
         return state.base_url;

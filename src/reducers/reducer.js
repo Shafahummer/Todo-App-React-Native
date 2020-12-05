@@ -1,7 +1,8 @@
 
 const initialState = {
     base_url: "http://192.168.1.6:5000/api",
-    user_token: ""
+    user_token: "",
+    profile_img: ""
 }
 export const reducer = (state = initialState, action) => {
     switch (action.type) {
@@ -9,6 +10,11 @@ export const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 user_token: action.payload
+            }
+        case 'SET_PROFILE_IMG':
+            return {
+                ...state,
+                profile_img: action.payload
             }
         default:
             return state;

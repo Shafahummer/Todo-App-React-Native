@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Image, FlatList, StyleSheet, SafeAreaView } from 'react-native';
-import { useSelector } from 'react-redux';
+import { View, Text, TouchableOpacity, Image, FlatList, StyleSheet, SafeAreaView, ActivityIndicator } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
 import { Buffer } from 'buffer/';
 import { getTodoDetails } from '../apicalls/getTodoDetails';
 import Toast from 'react-native-simple-toast';
+import axios from 'axios';
 
+const HomeScreen = ({ navigation }) => {
 
-const HomeScreen = () => {
+    const profileImg = useSelector((state) => {
+        return state.profile_img;
+    })
+    console.log("HOME SCREEN :", profileImg);
 
     const [apiData, setApiData] = useState(null)
 
@@ -18,14 +23,22 @@ const HomeScreen = () => {
         return state.user_token
     })
 
+    const dispatch = useDispatch()
+
+
     useEffect(() => {
-        getTodos()
-    }, [])
+        const unsubscribe = navigation.addListener('focus', () => {
+            getTodos()
+            getUser()
+        });
+        return unsubscribe;
+    }, [navigation]);
+
+
 
     const getTodos = () => {
         getTodoDetails(base_url, user_token)
             .then(data => {
-                console.log(data)
                 if (data.error) {
                     Toast.show(data.error)
                 }
@@ -36,9 +49,59 @@ const HomeScreen = () => {
             .catch(error => console.log(error))
     }
 
+    const getUser = () => {
+        axios.get(`${base_url}/user`,
+            {
+                headers: {
+                    Authorization: 'Bearer ' + user_token
+                }
+            })
+            .then(function (response) {
+                if (response.data.error) {
+                    Toast.show(response.data.error)
+                } else {
+                    dispatch({ type: "SET_PROFILE_IMG", payload: response.data.user.profile })
+                }
+            })
+            .catch(err => {
+                console.log(err);
+            })
+    }
+
+
+    const deleteTodo = async (id) => {
+        await axios({
+            url: `${base_url}/delete_todo`,
+            method: "delete",
+            data: {
+                todo_id: id
+            },
+            headers: { "Authorization": 'Bearer ' + user_token }
+        }).then(response => {
+            console.log(response.data);
+            if (response.data.error) {
+                Toast.show(response.data.error)
+            } else {
+                Toast.show("Todo deleted successfully...")
+                getTodos()
+            }
+        }).catch(error => {
+            console.log("Error--->", error);
+            Toast.show(error.toString())
+        })
+
+
+    }
+
+
     const renderItem = ({ item }) => {
         return (
             <View style={styles.itemContainer}>
+                <TouchableOpacity style={{ alignSelf: "baseline", padding: 15, position: "absolute", right: 0 }} onPress={() => {
+                    deleteTodo(item._id)
+                }}>
+                    <Image source={{ uri: "https://cdn1.iconfinder.com/data/icons/color-bold-style/21/56-512.png" }} style={{ height: 30, width: 30 }} />
+                </TouchableOpacity>
                 {item.photo ?
                     <Image
                         style={{ height: 100, width: 100, marginBottom: 10 }}
@@ -49,15 +112,20 @@ const HomeScreen = () => {
                     :
                     <Image
                         style={{ height: 100, width: 100, marginBottom: 10 }}
-                        source={require('../images/profile-photo.jpeg')}
+                        source={{ uri: "https://ultravires.ca/wp/wp-content/uploads/2018/03/Then-and-Now_-no-image-found.jpg" }}
                     />
                 }
                 <Text style={{ marginBottom: 10 }}>Todo Title : {item.title}</Text>
                 <Text style={{ marginBottom: 10 }}>Education: {item.education.education}</Text>
                 <Text style={{ marginBottom: 10 }}>Todo Date: {item.todo_date.split("T")[0]}</Text>
-                {item.todos.map((value, index) => (
-                    <Text style={{ marginBottom: 10 }}>What to do: {value.todo}</Text>
-                ))}
+                <FlatList
+                    data={item.todos}
+                    renderItem={({ item }) => (
+                        <Text style={{ marginBottom: 10 }}>What to do: {item.todo}</Text>
+                    )}
+                    listKey={item => item._id}
+                />
+
             </View>
         )
     };
@@ -72,12 +140,16 @@ const HomeScreen = () => {
         <>
             <SafeAreaView style={styles.top} />
             <SafeAreaView style={styles.container} >
-                {apiData !== null &&
+                {apiData ?
                     <FlatList
                         data={apiData.todo}
                         renderItem={renderItem}
                         keyExtractor={item => item.id}
                     />
+                    :
+                    <View style={{ justifyContent: "center" }}>
+                        <ActivityIndicator size="large" color="#75DA8B" />
+                    </View>
                 }
             </SafeAreaView>
         </>
