@@ -3,21 +3,28 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { Text, View, Image } from 'react-native';
+import { Text, View, Image, Alert } from 'react-native';
+import { useSelector } from 'react-redux';
 import SplashScreen from './SplashScreen';
 import LoginScreen from './LoginScreen';
 import RegistrationScreen from './RegistrationScreen';
 import AddTodoScreen from './AddTodoScreen';
 import HomeScreen from './HomeScreen';
 import ProfileScreen from './ProfileScreen';
-import { useSelector } from 'react-redux';
+import AdminPanel from './AdminPanel';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const Stack = createStackNavigator()
 
-const MainContainer = () => {
+const MainContainer = ({ navigation }) => {
 
     const profileImg = useSelector((state) => {
         return state.profile_img;
+    })
+
+    const user_role = useSelector((state) => {
+        return state.user_role
     })
 
     return (
@@ -41,11 +48,41 @@ const MainContainer = () => {
                     title: "Add Todo",
                     headerTitleAlign: "left",
                     headerRight: () => (
-                        <TouchableOpacity style={{ padding: 15 }} onPress={() => {
-                            navigation.navigate("HomeScreen")
-                        }}>
-                            <Text style={{ fontWeight: "bold" }}>Home</Text>
-                        </TouchableOpacity>
+                        <View style={{ alignItems: "center", flexDirection: "row" }}>
+                            <TouchableOpacity style={{ padding: 10 }} onPress={() => {
+                                navigation.navigate("HomeScreen")
+                            }}>
+                                <Text style={{ fontWeight: "bold" }}>Home</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={{ padding: 10 }} onPress={() => {
+                                Alert.alert(
+                                    '',
+                                    'Do you want to logout?',
+                                    [
+                                        { text: 'Cancel', style: 'cancel' },
+                                        {
+                                            text: 'OK', onPress: async () => {
+                                                await AsyncStorage.clear()
+                                                    .then(() => {
+
+                                                        navigation.reset({
+                                                            index: 0,
+                                                            routes: [{ name: 'LoginScreen' }]
+                                                        })
+                                                    })
+                                                    .catch(error => console.log(error))
+                                            }
+                                        },
+                                    ],
+                                    { cancelable: true }
+                                )
+
+
+                            }}>
+                                <Text style={{ fontWeight: "bold" }}>Logout</Text>
+                            </TouchableOpacity>
+
+                        </View>
                     )
                 })}
                 />
@@ -54,6 +91,13 @@ const MainContainer = () => {
                     headerTitleAlign: "left",
                     headerRight: () => (
                         <View style={{ flexDirection: "row", alignItems: "center" }}>
+                            {user_role == "1" &&
+                                <TouchableOpacity style={{ padding: 10 }} onPress={() => {
+                                    navigation.navigate("AdminPanel")
+                                }}>
+                                    <Text style={{ fontWeight: "bold" }}>Admin</Text>
+                                </TouchableOpacity>
+                            }
                             <TouchableOpacity style={{ padding: 10 }} onPress={() => {
                                 navigation.navigate("AddTodoScreen")
                             }}>
@@ -70,6 +114,11 @@ const MainContainer = () => {
                 />
                 <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={({ navigation }) => ({
                     title: "Profile",
+                    headerTitleAlign: "center",
+                })}
+                />
+                <Stack.Screen name="AdminPanel" component={AdminPanel} options={({ navigation }) => ({
+                    title: "Admin Panel",
                     headerTitleAlign: "center",
                 })}
                 />

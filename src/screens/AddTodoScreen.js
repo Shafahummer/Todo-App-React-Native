@@ -58,11 +58,6 @@ const AddTodoScreen = ({ navigation }) => {
     };
 
 
-
-
-
-
-
     const educationListArray = [];
     const todoListArray = [];
 
@@ -74,10 +69,15 @@ const AddTodoScreen = ({ navigation }) => {
         return state.user_token
     })
 
+
     useEffect(() => {
-        getEducation()
-        getTodos()
-    }, [])
+        const unsubscribe = navigation.addListener('focus', () => {
+            getEducation()
+            getTodos()
+            setShow(false)
+        });
+        return unsubscribe;
+    }, [navigation]);
 
     const getEducation = () => {
         axios.get(`${base_url}/get_educations`,
@@ -186,6 +186,10 @@ const AddTodoScreen = ({ navigation }) => {
                     }
                     else {
                         Toast.show("Successfully added todo...")
+                        setShow(false)
+                        setTimeout(() => {
+                            navigation.replace("HomeScreen")
+                        }, 2000)
                     }
                 }).catch((err) => {
                     setLoading(false)

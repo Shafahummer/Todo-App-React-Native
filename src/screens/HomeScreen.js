@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Image, FlatList, StyleSheet, SafeAreaView, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, Image, FlatList, StyleSheet, SafeAreaView, ActivityIndicator, Alert } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { Buffer } from 'buffer/';
 import { getTodoDetails } from '../apicalls/getTodoDetails';
@@ -7,11 +7,6 @@ import Toast from 'react-native-simple-toast';
 import axios from 'axios';
 
 const HomeScreen = ({ navigation }) => {
-
-    const profileImg = useSelector((state) => {
-        return state.profile_img;
-    })
-    console.log("HOME SCREEN :", profileImg);
 
     const [apiData, setApiData] = useState(null)
 
@@ -24,7 +19,6 @@ const HomeScreen = ({ navigation }) => {
     })
 
     const dispatch = useDispatch()
-
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
@@ -43,6 +37,18 @@ const HomeScreen = ({ navigation }) => {
                     Toast.show(data.error)
                 }
                 else {
+                    if (data.todo.length === 0) {
+                        Alert.alert(
+                            "",
+                            "No todos found...",
+                            [
+
+                                { text: "OK", onPress: () => navigation.goBack() }
+                            ],
+                            { cancelable: false }
+                        );
+
+                    }
                     setApiData(data)
                 }
             })
@@ -61,6 +67,7 @@ const HomeScreen = ({ navigation }) => {
                     Toast.show(response.data.error)
                 } else {
                     dispatch({ type: "SET_PROFILE_IMG", payload: response.data.user.profile })
+                    dispatch({ type: "SET_USER_ROLE", payload: response.data.user.role })
                 }
             })
             .catch(err => {
